@@ -20,6 +20,13 @@ import { RNCamera as Camera } from 'react-native-camera';
 
 const PERMISSION_AUTHORIZED = 'authorized';
 const CAMERA_PERMISSION = 'camera';
+const CAMERA_FLASH_MODE = Camera.Constants.FlashMode;
+const CAMERA_FLASH_MODES = [
+  CAMERA_FLASH_MODE.torch,
+  CAMERA_FLASH_MODE.on,
+  CAMERA_FLASH_MODE.off,
+  CAMERA_FLASH_MODE.auto,
+];
 
 export default class QRCodeScanner extends Component {
   static propTypes = {
@@ -43,6 +50,7 @@ export default class QRCodeScanner extends Component {
     permissionDialogMessage: PropTypes.string,
     checkAndroid6Permissions: PropTypes.bool,
     cameraProps: PropTypes.object,
+    flashMode: PropTypes.oneOf(CAMERA_FLASH_MODES),
   };
 
   static defaultProps = {
@@ -93,6 +101,7 @@ export default class QRCodeScanner extends Component {
     permissionDialogMessage: 'Need camera permission',
     checkAndroid6Permissions: false,
     cameraProps: {},
+    flashMode: CAMERA_FLASH_MODE.auto,
   };
 
   constructor(props) {
@@ -101,6 +110,7 @@ export default class QRCodeScanner extends Component {
       scanning: false,
       fadeInOpacity: new Animated.Value(0),
       isAuthorized: false,
+      flashMode: props.flashMode,
       isAuthorizationChecked: false,
       disableVibrationByUser: false,
     };
@@ -196,7 +206,12 @@ export default class QRCodeScanner extends Component {
       } else {
         return (
           <View style={styles.rectangleContainer}>
-            <View style={[styles.rectangle, this.props.markerStyle ? this.props.markerStyle : null]} />
+            <View
+              style={[
+                styles.rectangle,
+                this.props.markerStyle ? this.props.markerStyle : null,
+              ]}
+            />
           </View>
         );
       }
@@ -225,6 +240,7 @@ export default class QRCodeScanner extends Component {
               onBarCodeRead={this._handleBarCodeRead.bind(this)}
               type={this.props.cameraType}
               {...this.props.cameraProps}
+              flashMode={this.state.flashMode}
             >
               {this._renderCameraMarker()}
             </Camera>
@@ -236,6 +252,7 @@ export default class QRCodeScanner extends Component {
           type={cameraType}
           style={[styles.camera, this.props.cameraStyle]}
           onBarCodeRead={this._handleBarCodeRead.bind(this)}
+          flashMode={this.state.flashMode}
           {...this.props.cameraProps}
         >
           {this._renderCameraMarker()}
